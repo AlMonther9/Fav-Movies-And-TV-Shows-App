@@ -1,11 +1,13 @@
-# Favorite Movies & TV Shows Web Application
+# CyberLib - Digital Entertainment Collection
 
-A full-stack web application that allows users to manage their favorite movies and TV shows with CRUD operations, infinite scrolling, and a modern responsive UI.
+A full-stack web application that allows users to manage their favorite movies and TV shows with CRUD operations, infinite scrolling, and a modern cyberpunk-themed responsive UI.
 
 ## Features
 
 ### Core Features
 
+- ✅ **Personal Collection**: Build your own digital library of favorite movies and TV shows
+- ✅ **Starter Collection**: New users get a curated collection of cyberpunk classics to start with
 - ✅ **Add New Entry**: Add movies/TV shows with detailed information
 - ✅ **Display Entries**: View all entries in a responsive table format
 - ✅ **Infinite Scroll**: Automatically load more entries as you scroll
@@ -22,14 +24,18 @@ A full-stack web application that allows users to manage their favorite movies a
 - ✅ **User Profiles**: Avatar display and user-specific collections
 - ✅ **Password Security**: Bcrypt hashing with salt rounds
 - ✅ **Account Linking**: Link multiple auth providers to one account
+- ✅ **Auto-Seeding**: New users automatically get a starter collection
 
 ### Technical Features
 
 - ✅ **Modern UI**: Built with shadcn/ui components and Tailwind CSS
+- ✅ **Cyberpunk Theme**: Dark/light theme with neon accents and animations
 - ✅ **Form Validation**: Client-side validation with error handling
 - ✅ **Loading States**: Smooth loading indicators and transitions
 - ✅ **Toast Notifications**: User feedback for all actions
 - ✅ **Accessibility**: ARIA labels, keyboard navigation, screen reader support
+- ✅ **Real Database**: Connected to PostgreSQL with Prisma ORM
+- ✅ **API Security**: Protected endpoints with user authentication
 
 ## Technology Stack
 
@@ -40,8 +46,9 @@ A full-stack web application that allows users to manage their favorite movies a
 - **Tailwind CSS** for styling
 - **shadcn/ui** for UI components
 - **Lucide React** for icons
+- **next-themes** for theme switching
 
-### Authentication
+### Authentication & Database
 
 - **NextAuth.js** for authentication
 - **Prisma ORM** with PostgreSQL
@@ -51,9 +58,9 @@ A full-stack web application that allows users to manage their favorite movies a
 ### Backend
 
 - **Next.js API Routes** (RESTful endpoints)
-- **MySQL** database (schema provided)
-- **Prisma ORM** (configuration included)
+- **PostgreSQL** database
 - **Zod** for schema validation
+- **Server-side authentication** with session management
 
 ## Getting Started
 
@@ -61,7 +68,7 @@ A full-stack web application that allows users to manage their favorite movies a
 
 - Node.js 18+
 - PostgreSQL database (we recommend Neon)
-- pnpm
+- npm or yarn
 - OAuth provider credentials (optional)
 
 ### Installation
@@ -74,7 +81,7 @@ A full-stack web application that allows users to manage their favorite movies a
 
 2. **Install dependencies**
    \`\`\`bash
-   pnpm install
+   npm install
    \`\`\`
 
 3. **Set up the database**
@@ -88,7 +95,7 @@ A full-stack web application that allows users to manage their favorite movies a
    **Option B: Local PostgreSQL**
 
    - Install PostgreSQL locally
-   - Create a database named `CyberLib`
+   - Create a database named `cyberlib`
 
 4. **Configure environment variables**
    Create a `.env.local` file:
@@ -154,7 +161,8 @@ A full-stack web application that allows users to manage their favorite movies a
 
 - `MediaEntry` - User's favorite movies and TV shows
   - Linked to specific users via `userId`
-  - All existing fields (title, type, director, etc.)
+  - Support for global/starter entries with `isGlobal` flag
+  - Reference to original global entries with `globalId`
   - User-specific collections and privacy
 
 ## API Endpoints
@@ -171,6 +179,10 @@ A full-stack web application that allows users to manage their favorite movies a
 - `PUT /api/media/[id]` - Update media entry (authenticated, owner only)
 - `DELETE /api/media/[id]` - Delete media entry (authenticated, owner only)
 
+### User Management
+
+- `POST /api/seed-user` - Seed user's collection with starter entries
+
 ## Project Structure
 
 \`\`\`
@@ -179,7 +191,8 @@ A full-stack web application that allows users to manage their favorite movies a
 │ │ ├── auth/
 │ │ │ ├── [...nextauth]/route.ts # NextAuth.js handler
 │ │ │ └── register/route.ts # User registration
-│ │ └── media/ # Media API routes
+│ │ ├── media/ # Media API routes
+│ │ └── seed-user/route.ts # User seeding endpoint
 │ ├── auth/
 │ │ ├── signin/page.tsx # Sign in page
 │ │ └── signup/page.tsx # Sign up page
@@ -187,81 +200,84 @@ A full-stack web application that allows users to manage their favorite movies a
 │ ├── layout.tsx
 │ └── page.tsx
 ├── components/
+│ ├── admin/
+│ │ └── seed-button.tsx # Starter collection button
 │ ├── auth/ # Authentication components
 │ │ ├── auth-guard.tsx
 │ │ ├── auth-provider.tsx
 │ │ ├── signin-form.tsx
 │ │ ├── signup-form.tsx
 │ │ └── user-menu.tsx
+│ ├── landing/
+│ │ └── landing-page.tsx # Landing page for unauthenticated users
 │ └── ui/ # shadcn/ui components
+├── hooks/
+│ ├── use-media.ts # Media management hook
+│ └── use-toast.ts # Toast notifications
 ├── lib/
+│ ├── api.ts # API client
 │ ├── auth.ts # NextAuth.js configuration
 │ ├── prisma.ts # Prisma client
-│ └── utils.ts
+│ └── seed-user.ts # User seeding logic
 ├── prisma/
 │ └── schema.prisma # Database schema
+├── types/
+│ ├── media.ts # Media type definitions
+│ └── next-auth.d.ts # NextAuth type extensions
 ├── package.json
 ├── tailwind.config.ts
 └── README.md
 \`\`\`
 
-## Authentication
+## User Experience
 
-### Sign Up / Sign In
+### New User Journey
 
-- **Email/Password**: Create account with email and secure password
-- **Google OAuth**: Sign in with your Google account
-- **GitHub OAuth**: Sign in with your GitHub account
-- **Account Linking**: Link multiple providers to one account
+1. **Landing Page**: Beautiful cyberpunk-themed landing page with features overview
+2. **Sign Up**: Choose from email/password, Google, or GitHub authentication
+3. **Starter Collection**: Automatically receive a curated collection of cyberpunk classics
+4. **Personalization**: Add, edit, and organize your own favorite movies and shows
 
-### User Sessions
+### Existing User Experience
 
-- **Persistent Sessions**: Stay logged in across browser sessions
-- **Automatic Refresh**: JWT tokens refresh automatically
-- **Secure Sign Out**: Proper session cleanup on logout
-
-### Route Protection
-
-- **Protected Routes**: Main app requires authentication
-- **Automatic Redirects**: Unauthenticated users redirected to sign in
-- **Loading States**: Smooth authentication state transitions
-
-## Usage
-
-### Getting Started
-
-1. **Sign up** for a new account or **sign in** with existing credentials
-2. Choose from email/password, Google, or GitHub authentication
-3. Access your personal CyberLib collection
+- **Instant Access**: Fast authentication with persistent sessions
+- **Personal Collection**: Your movies and shows are private and secure
+- **Starter Collection**: Option to add starter collection if desired
+- **Seamless Sync**: Changes are saved instantly with real-time feedback
 
 ### Managing Your Collection
 
-[Keep existing usage instructions but mention they're now user-specific]
-
-### Adding Entries
+#### Adding Entries
 
 1. Click "Add New Entry" button
 2. Fill in the required fields (Title, Type, Director)
 3. Add optional details (Budget, Location, Duration, etc.)
-4. Click "Add Entry" to save
+4. Click "Create Entry" to save
 
-### Editing Entries
+#### Editing Entries
 
 1. Click the edit icon (pencil) in the Actions column
 2. Modify the fields in the dialog
 3. Click "Update Entry" to save changes
 
-### Deleting Entries
+#### Deleting Entries
 
 1. Click the delete icon (trash) in the Actions column
 2. Confirm deletion in the alert dialog
 3. Entry will be permanently removed
 
-### Search & Filter
+#### Search & Filter
 
 - Use the search bar to find entries by title, director, or genre
 - Use the filter dropdown to show only Movies or TV Shows
 - Combine search and filter for precise results
+
+#### Starter Collection
+
+- New users automatically get a curated collection of cyberpunk classics
+- Existing users can add the starter collection using the "Get Starter Collection" button
+- Starter entries are marked with a "Starter" badge and globe icon
+- You can edit or delete starter entries just like your own
 
 ## Deployment
 
@@ -274,12 +290,13 @@ npm run build
 
 \`\`\`
 
-### Backend Options
+### Database Options
 
-- **Vercel**: Deploy with Vercel Postgres or PlanetScale
-- **Railway**: Deploy with Railway MySQL
+- **Neon**: Recommended for PostgreSQL (free tier available)
+- **Supabase**: Alternative PostgreSQL option
+- **Railway**: Deploy with Railway PostgreSQL
 - **Render**: Deploy with Render PostgreSQL
-- **AWS**: Deploy with RDS MySQL
+- **AWS**: Deploy with RDS PostgreSQL
 
 ### Environment Variables for Production
 
@@ -295,18 +312,6 @@ GITHUB_SECRET="your-github-client-secret"
 
 ## Future Enhancements
 
-### Authentication & User Features
-
-- [ ] Email verification for new accounts
-- [ ] Password reset functionality
-- [ ] User profile management
-- [ ] Two-factor authentication (2FA)
-- [ ] Social features (sharing collections)
-- [ ] Role-based access control
-- [x] ~~User authentication (login/signup/logout)~~
-- [x] ~~OAuth providers (Google, GitHub)~~
-- [x] ~~User-specific collections~~
-
 ### Planned Features
 
 - [ ] Image upload for movie/show posters
@@ -314,8 +319,11 @@ GITHUB_SECRET="your-github-client-secret"
 - [ ] Export data to CSV/JSON
 - [ ] Watchlist and favorites categories
 - [ ] Social features (sharing, reviews)
-- [ ] Dark/light theme toggle
 - [ ] Bulk operations (delete multiple)
+- [ ] Email verification for new accounts
+- [ ] Password reset functionality
+- [ ] User profile management
+- [ ] Two-factor authentication (2FA)
 
 ### Technical Improvements
 
@@ -325,6 +333,18 @@ GITHUB_SECRET="your-github-client-secret"
 - [ ] Progressive Web App (PWA)
 - [ ] Unit and integration tests
 - [ ] Performance monitoring
+- [ ] Mobile app (React Native)
+
+### Completed Features
+
+- [x] ~~User authentication (login/signup/logout)~~
+- [x] ~~OAuth providers (Google, GitHub)~~
+- [x] ~~User-specific collections~~
+- [x] ~~Real database integration~~
+- [x] ~~Global starter collection system~~
+- [x] ~~Landing page for unauthenticated users~~
+- [x] ~~Dark/light theme toggle~~
+- [x] ~~Cyberpunk theme with animations~~
 
 ## Contributing
 
@@ -341,3 +361,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Support
 
 For support, email support@example.com or create an issue in the GitHub repository.
+
+---
+
+**Built with ❤️ and ⚡ for the cyberpunk future**
