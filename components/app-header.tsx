@@ -59,7 +59,7 @@ export function AppHeader() {
           {/* Main title with cyberpunk styling */}
           <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-cyan-600 via-purple-600 to-pink-600 dark:from-cyan-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent animate-pulse">
             CYBER
-            <span className="text-gray-900 dark:text-white">FLIX</span>
+            <span className="text-gray-900 dark:text-white">LIB</span>
           </h1>
 
           {/* Subtitle with glow effect */}
