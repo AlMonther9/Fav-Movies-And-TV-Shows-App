@@ -1,0 +1,12 @@
+-- Insert sample data for testing
+INSERT INTO media_entries (title, type, director, budget, location, duration, year, genre, description, rating) VALUES
+('Inception', 'Movie', 'Christopher Nolan', '$160M', 'Los Angeles, Paris', '148 min', '2010', 'Sci-Fi', 'A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.', 5),
+('Breaking Bad', 'TV Show', 'Vince Gilligan', '$3M/ep', 'Albuquerque', '49 min/ep', '2008-2013', 'Drama', 'A high school chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing and selling methamphetamine.', 5),
+('The Dark Knight', 'Movie', 'Christopher Nolan', '$185M', 'Chicago', '152 min', '2008', 'Action', 'When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests.', 5),
+('Game of Thrones', 'TV Show', 'David Benioff', '$6M/ep', 'Northern Ireland', '57 min/ep', '2011-2019', 'Fantasy', 'Nine noble families fight for control over the lands of Westeros, while an ancient enemy returns after being dormant for millennia.', 4),
+('Pulp Fiction', 'Movie', 'Quentin Tarantino', '$8.5M', 'Los Angeles', '154 min', '1994', 'Crime', 'The lives of two mob hitmen, a boxer, a gangster and his wife intertwine in four tales of violence and redemption.', 5),
+('Stranger Things', 'TV Show', 'The Duffer Brothers', '$8M/ep', 'Atlanta', '51 min/ep', '2016-2022', 'Horror', 'When a young boy disappears, his mother, a police chief and his friends must confront terrifying supernatural forces.', 4),
+('The Godfather', 'Movie', 'Francis Ford Coppola', '$6M', 'New York', '175 min', '1972', 'Crime', 'The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.', 5),
+('The Office', 'TV Show', 'Greg Daniels', '$2M/ep', 'Scranton', '22 min/ep', '2005-2013', 'Comedy', 'A mockumentary on a group of typical office workers, where the workday consists of ego clashes, inappropriate behavior, and tedium.', 4),
+('Interstellar', 'Movie', 'Christopher Nolan', '$165M', 'Alberta, Iceland', '169 min', '2014', 'Sci-Fi', 'A team of explorers travel through a wormhole in space in an attempt to ensure humanity survival.', 5),
+('Better Call Saul', 'TV Show', 'Vince Gilligan', '$4M/ep', 'Albuquerque', '47 min/ep', '2015-2022', 'Drama', 'The trials and tribulations of criminal lawyer Jimmy McGill in the time before he established his strip-mall law office in Albuquerque.', 4);
