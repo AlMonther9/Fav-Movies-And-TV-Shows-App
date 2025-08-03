@@ -62,22 +62,22 @@ export function SearchAndFilters({
                   <SelectTrigger className="w-40 bg-white/60 dark:bg-black/60 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:border-purple-500 dark:focus:border-purple-500 focus:ring-purple-500/20 dark:focus:ring-purple-500/20 transition-all duration-300">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white/95 dark:bg-black/90 border-gray-300 dark:border-gray-700 backdrop-blur-sm">
+                  <SelectContent className="bg-white/95 dark:bg-black/90 border-gray-300 dark:border-gray-700 backdrop-blur-sm cursor-pointer">
                     <SelectItem
                       value="all"
-                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400"
+                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400 cursor-pointer"
                     >
                       All Types
                     </SelectItem>
                     <SelectItem
                       value="Movie"
-                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400"
+                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400 cursor-pointer"
                     >
                       Movies
                     </SelectItem>
                     <SelectItem
                       value="TV Show"
-                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400"
+                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400 cursor-pointer"
                     >
                       TV Shows
                     </SelectItem>
