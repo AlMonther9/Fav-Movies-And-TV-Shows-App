@@ -37,10 +37,11 @@ export function SearchAndFilters({
       {/* Controls Card */}
       <Card className="border-cyan-500/20 dark:border-cyan-500/20 bg-white/80 dark:bg-black/40 backdrop-blur-sm hover:border-cyan-500/40 dark:hover:border-cyan-500/40 transition-all duration-300">
         <CardContent className="pt-6">
-          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-            <div className="flex flex-col sm:flex-row gap-4 flex-1 w-full">
+          <div className="flex flex-col gap-4">
+            {/* Search and Filter Row */}
+            <div className="flex flex-col sm:flex-row gap-4 w-full">
               {/* Search Input */}
-              <div className="relative flex-1 max-w-md group">
+              <div className="relative flex-1 group">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-500 dark:text-cyan-400 w-4 h-4 group-focus-within:text-cyan-400 dark:group-focus-within:text-cyan-300 transition-colors" />
                 <Input
                   placeholder="Search the digital archives..."
@@ -52,7 +53,7 @@ export function SearchAndFilters({
               </div>
 
               {/* Filter Select */}
-              <div className="flex items-center gap-2 group">
+              <div className="flex items-center gap-2 group sm:min-w-fit">
                 <Filter className="w-4 h-4 text-purple-500 dark:text-purple-400 group-hover:text-purple-400 dark:group-hover:text-purple-300 transition-colors" />
                 <Select
                   value={filterType}
@@ -60,48 +61,49 @@ export function SearchAndFilters({
                     onFilterChange(value)
                   }
                 >
-                  <SelectTrigger className="w-40 bg-white/60 dark:bg-black/60 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:border-purple-500 dark:focus:border-purple-500 focus:ring-purple-500/20 dark:focus:ring-purple-500/20 transition-all duration-300">
+                  <SelectTrigger className="w-full sm:w-40 bg-white/60 dark:bg-black/60 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:border-purple-500 dark:focus:border-purple-500 focus:ring-purple-500/20 dark:focus:ring-purple-500/20 transition-all duration-300">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-white/95 dark:bg-black/90 border-gray-300 dark:border-gray-700 backdrop-blur-sm">
                     <SelectItem
                       value="all"
-                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400"
+                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400 cursor-pointer"
                     >
                       All Types
                     </SelectItem>
                     <SelectItem
                       value="Movie"
-                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400"
+                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400 cursor-pointer"
                     >
                       Movies
                     </SelectItem>
                     <SelectItem
                       value="TV Show"
-                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400"
+                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400 cursor-pointer"
                     >
                       TV Shows
                     </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-2">
-              {/* Seed Buttons (for testing/admin) */}
-              <SeedButton />
+              {/* Action Buttons - Desktop: Same row, Mobile: Stack below */}
+              <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+                {/* Seed Buttons (for testing/admin) */}
+                <SeedButton />
 
-              {/* Add Button */}
-              <Button
-                onClick={onAddClick}
-                className="bg-gradient-to-r from-cyan-600 to-purple-600 dark:from-cyan-600 dark:to-purple-600 hover:from-cyan-500 hover:to-purple-500 dark:hover:from-cyan-500 dark:hover:to-purple-500 text-white border-0 shadow-lg hover:shadow-cyan-500/25 dark:hover:shadow-cyan-500/25 transition-all duration-300 group relative overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                <Plus className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform duration-300" />
-                Add New Entry
-                <Zap className="w-3 h-3 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </Button>
+                {/* Add Button */}
+                <Button
+                  onClick={onAddClick}
+                  className="w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-purple-600 dark:from-cyan-600 dark:to-purple-600 hover:from-cyan-500 hover:to-purple-500 dark:hover:from-cyan-500 dark:hover:to-purple-500 text-white border-0 shadow-lg hover:shadow-cyan-500/25 dark:hover:shadow-cyan-500/25 transition-all duration-300 group relative overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                  <Plus className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform duration-300" />
+                  <span className="hidden sm:inline">Add New Entry</span>
+                  <span className="sm:hidden">Add Entry</span>
+                  <Zap className="w-3 h-3 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
