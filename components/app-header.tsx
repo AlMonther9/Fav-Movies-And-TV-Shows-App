@@ -79,7 +79,7 @@ export function AppHeader() {
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Welcome back,{" "}
               <span className="text-cyan-600 dark:text-cyan-400 font-semibold">
-                {session.user.name}
+                {session.user?.name}
               </span>
               !
             </p>

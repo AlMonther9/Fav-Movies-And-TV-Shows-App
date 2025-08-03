@@ -1,125 +1,152 @@
-import { type NextRequest, NextResponse } from "next/server"
-
-// This would typically connect to your MySQL database
-// For demo purposes, we'll use mock data
+import { type NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 interface MediaEntry {
-  id: number
-  title: string
-  type: "Movie" | "TV Show"
-  director: string
-  budget: string
-  location: string
-  duration: string
-  year: string
-  genre: string
-  description: string
-  rating: number
-  createdAt: string
+  id: number;
+  title: string;
+  type: "Movie" | "TV Show";
+  director: string;
+  budget: string;
+  location: string;
+  duration: string;
+  year: string;
+  genre: string;
+  description: string;
+  rating: number;
+  createdAt: string;
+  userId: number;
 }
 
-// Mock database
-const mockDatabase: MediaEntry[] = [
-  {
-    id: 1,
-    title: "Inception",
-    type: "Movie",
-    director: "Christopher Nolan",
-    budget: "$160M",
-    location: "Los Angeles, Paris",
-    duration: "148 min",
-    year: "2010",
-    genre: "Sci-Fi",
-    description:
-      "A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
-    rating: 5,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    title: "Breaking Bad",
-    type: "TV Show",
-    director: "Vince Gilligan",
-    budget: "$3M/ep",
-    location: "Albuquerque",
-    duration: "49 min/ep",
-    year: "2008-2013",
-    genre: "Drama",
-    description:
-      "A high school chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing and selling methamphetamine.",
-    rating: 5,
-    createdAt: new Date().toISOString(),
-  },
-]
+const mediaEntrySchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  type: z.enum(["Movie", "TV_Show"]),
+  director: z.string().min(1, "Director is required"),
+  budget: z.string().optional(),
+  location: z.string().optional(),
+  duration: z.string().optional(),
+  year: z.string().optional(),
+  genre: z.string().optional(),
+  description: z.string().optional(),
+  rating: z.number().min(1).max(5).default(5),
+});
 
-// GET - Fetch media entries with pagination
+// GET - Fetch media entries with pagination and filtering
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const page = Number.parseInt(searchParams.get("page") || "1")
-  const limit = Number.parseInt(searchParams.get("limit") || "10")
-  const search = searchParams.get("search") || ""
-  const type = searchParams.get("type") || "all"
+  try {
+    const session = await getServerSession(authOptions) as { user?: { id: string } };
 
-  let filteredEntries = mockDatabase
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-  // Apply search filter
-  if (search) {
-    filteredEntries = filteredEntries.filter(
-      (entry) =>
-        entry.title.toLowerCase().includes(search.toLowerCase()) ||
-        entry.director.toLowerCase().includes(search.toLowerCase()) ||
-        entry.genre.toLowerCase().includes(search.toLowerCase()),
-    )
+    const { searchParams } = new URL(request.url);
+    const page = Number.parseInt(searchParams.get("page") || "1");
+    const limit = Number.parseInt(searchParams.get("limit") || "10");
+    const search = searchParams.get("search") || "";
+    const type = searchParams.get("type") || "all";
+
+    // Build where clause for filtering
+    const where: any = {
+      userId: session.user.id,
+    };
+
+    // Add search filter
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { director: { contains: search, mode: "insensitive" } },
+        { genre: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    // Add type filter
+    if (type !== "all") {
+      where.type = type === "TV Show" ? "TV_Show" : "Movie";
+    }
+
+    // Get total count for pagination
+    const totalCount = await prisma.mediaEntry.count({ where });
+
+    // Get paginated entries
+    const entries = await prisma.mediaEntry.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    // Transform the data to match frontend expectations
+    const transformedEntries = entries.map((entry) => ({
+      ...entry,
+      type: entry.type === "TV_Show" ? "TV Show" : entry.type,
+    }));
+
+    const hasMore = page * limit < totalCount;
+
+    return NextResponse.json({
+      entries: transformedEntries,
+      totalCount,
+      hasMore,
+      page,
+      limit,
+    });
+  } catch (error) {
+    console.error("Error fetching media entries:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
-
-  // Apply type filter
-  if (type !== "all") {
-    filteredEntries = filteredEntries.filter((entry) => entry.type === type)
-  }
-
-  // Apply pagination
-  const startIndex = (page - 1) * limit
-  const endIndex = startIndex + limit
-  const paginatedEntries = filteredEntries.slice(startIndex, endIndex)
-
-  return NextResponse.json({
-    entries: paginatedEntries,
-    totalCount: filteredEntries.length,
-    hasMore: endIndex < filteredEntries.length,
-    page,
-    limit,
-  })
 }
 
 // POST - Create new media entry
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const session = await getServerSession(authOptions) as { user?: { id: string } };
 
-    // Validate required fields
-    if (!body.title || !body.director || !body.type) {
-      return NextResponse.json({ error: "Missing required fields: title, director, type" }, { status: 400 })
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const newEntry: MediaEntry = {
-      id: Date.now(), // In real app, this would be auto-generated by database
-      title: body.title,
-      type: body.type,
-      director: body.director,
-      budget: body.budget || "",
-      location: body.location || "",
-      duration: body.duration || "",
-      year: body.year || "",
-      genre: body.genre || "",
-      description: body.description || "",
-      rating: body.rating || 5,
-      createdAt: new Date().toISOString(),
-    }
+    const body = await request.json();
 
-    mockDatabase.unshift(newEntry) // Add to beginning of array
+    // Validate the request body
+    const validatedData = mediaEntrySchema.parse(body);
 
-    return NextResponse.json(newEntry, { status: 201 })
+    // Transform type for database
+    const dbType =
+      validatedData.type === "TV_Show" ? "TV_Show" : validatedData.type;
+
+    const newEntry = await prisma.mediaEntry.create({
+      data: {
+        ...validatedData,
+        type: dbType,
+        userId: session.user.id,
+      },
+    });
+
+    // Transform back for frontend
+    const transformedEntry = {
+      ...newEntry,
+      type: newEntry.type === "TV_Show" ? "TV Show" : newEntry.type,
+    };
+
+    return NextResponse.json(transformedEntry, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Validation failed", details: error.errors },
+        { status: 400 }
+      );
+    }
+
+    console.error("Error creating media entry:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

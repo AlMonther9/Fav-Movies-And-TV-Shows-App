@@ -19,7 +19,7 @@ interface MediaTableProps {
   hasMore: boolean;
   onLoadMore: () => void;
   onEdit: (entry: MediaEntry) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: number) => Promise<void>;
 }
 
 export function MediaTable({

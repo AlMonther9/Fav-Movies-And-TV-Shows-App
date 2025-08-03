@@ -3,7 +3,11 @@
 import type React from "react";
 
 import { SessionProvider } from "next-auth/react";
-import type { Session } from "next-auth";
+import type { Session as NextAuthSession } from "next-auth";
+
+interface Session extends NextAuthSession {
+  expires: string;
+}
 
 interface AuthProviderProps {
   children: React.ReactNode;

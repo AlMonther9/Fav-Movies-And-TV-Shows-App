@@ -57,12 +57,12 @@ export function AddEntryModal({
         title: editingEntry.title,
         type: editingEntry.type,
         director: editingEntry.director,
-        budget: editingEntry.budget,
-        location: editingEntry.location,
-        duration: editingEntry.duration,
-        year: editingEntry.year,
-        genre: editingEntry.genre,
-        description: editingEntry.description,
+        budget: editingEntry.budget ?? "",
+        location: editingEntry.location ?? "",
+        duration: editingEntry.duration ?? "",
+        year: editingEntry.year ?? "",
+        genre: editingEntry.genre ?? "",
+        description: editingEntry.description ?? "",
         rating: editingEntry.rating,
       });
     } else {

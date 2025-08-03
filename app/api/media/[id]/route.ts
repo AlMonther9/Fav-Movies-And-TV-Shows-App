@@ -1,59 +1,144 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
-// Mock database (in real app, this would be your database connection)
-const mockDatabase = [
-  // ... your mock data here
-]
+const mediaEntrySchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  type: z.enum(["Movie", "TV Show"]),
+  director: z.string().min(1, "Director is required"),
+  budget: z.string().optional(),
+  location: z.string().optional(),
+  duration: z.string().optional(),
+  year: z.string().optional(),
+  genre: z.string().optional(),
+  description: z.string().optional(),
+  rating: z.number().min(1).max(5).default(5),
+});
 
 // PUT - Update media entry
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const { id } = await params
-    const body = await request.json()
+    const session = await getServerSession(authOptions) as { user?: { id: string } };
 
-    const entryIndex = mockDatabase.findIndex((entry) => entry.id === Number.parseInt(id))
-
-    if (entryIndex === -1) {
-      return NextResponse.json({ error: "Entry not found" }, { status: 404 })
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Validate required fields
-    if (!body.title || !body.director || !body.type) {
-      return NextResponse.json({ error: "Missing required fields: title, director, type" }, { status: 400 })
+    const { id } = params;
+    const entryId = Number.parseInt(id);
+
+    if (isNaN(entryId)) {
+      return NextResponse.json({ error: "Invalid entry ID" }, { status: 400 });
     }
 
-    const updatedEntry = {
-      ...mockDatabase[entryIndex],
-      ...body,
-      id: Number.parseInt(id), // Ensure ID doesn't change
-      updatedAt: new Date().toISOString(),
+    // Check if entry exists and belongs to user
+    const existingEntry = await prisma.mediaEntry.findFirst({
+      where: {
+        id: entryId,
+        userId: session.user.id,
+      },
+    });
+
+    if (!existingEntry) {
+      return NextResponse.json(
+        { error: "Entry not found or access denied" },
+        { status: 404 }
+      );
     }
 
-    mockDatabase[entryIndex] = updatedEntry
+    const body = await request.json();
+    const validatedData = mediaEntrySchema.parse(body);
 
-    return NextResponse.json(updatedEntry)
+    // Transform type for database
+    const dbType =
+      validatedData.type === "TV Show" ? "TV_Show" : validatedData.type;
+
+    const updatedEntry = await prisma.mediaEntry.update({
+      where: { id: entryId },
+      data: {
+        ...validatedData,
+        type: dbType,
+      },
+    });
+
+    // Transform back for frontend
+    const transformedEntry = {
+      ...updatedEntry,
+      type: updatedEntry.type === "TV_Show" ? "TV Show" : updatedEntry.type,
+    };
+
+    return NextResponse.json(transformedEntry);
   } catch (error) {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Validation failed", details: error.errors },
+        { status: 400 }
+      );
+    }
+
+    console.error("Error updating media entry:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
 // DELETE - Delete media entry
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const { id } = await params
-    const entryIndex = mockDatabase.findIndex((entry) => entry.id === Number.parseInt(id))
+    const session = await getServerSession(authOptions) as { user?: { id: string } };
 
-    if (entryIndex === -1) {
-      return NextResponse.json({ error: "Entry not found" }, { status: 404 })
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const deletedEntry = mockDatabase.splice(entryIndex, 1)[0]
+    const { id } = params;
+    const entryId = Number.parseInt(id);
+
+    if (isNaN(entryId)) {
+      return NextResponse.json({ error: "Invalid entry ID" }, { status: 400 });
+    }
+
+    // Check if entry exists and belongs to user
+    const existingEntry = await prisma.mediaEntry.findFirst({
+      where: {
+        id: entryId,
+        userId: session.user.id,
+      },
+    });
+
+    if (!existingEntry) {
+      return NextResponse.json(
+        { error: "Entry not found or access denied" },
+        { status: 404 }
+      );
+    }
+
+    await prisma.mediaEntry.delete({
+      where: { id: entryId },
+    });
 
     return NextResponse.json({
       message: "Entry deleted successfully",
-      deletedEntry,
-    })
+      deletedEntry: {
+        ...existingEntry,
+        type: existingEntry.type === "TV_Show" ? "TV Show" : existingEntry.type,
+      },
+    });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to delete entry" }, { status: 500 })
+    console.error("Error deleting media entry:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

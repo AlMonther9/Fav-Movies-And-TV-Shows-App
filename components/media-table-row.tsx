@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,13 +11,26 @@ import type { MediaEntry } from "@/types/media";
 interface MediaTableRowProps {
   entry: MediaEntry;
   onEdit: (entry: MediaEntry) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: number) => Promise<void>;
 }
 
 export const MediaTableRow = forwardRef<
   HTMLTableRowElement,
   MediaTableRowProps
 >(({ entry, onEdit, onDelete }, ref) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await onDelete(entry.id);
+    } catch (error) {
+      // Error is handled in the parent component
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <TableRow
       ref={ref}
@@ -60,19 +73,19 @@ export const MediaTableRow = forwardRef<
       </TableCell>
 
       <TableCell className="text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors">
-        {entry.budget}
+        {entry.budget || "-"}
       </TableCell>
 
       <TableCell className="text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors">
-        {entry.location}
+        {entry.location || "-"}
       </TableCell>
 
       <TableCell className="text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors">
-        {entry.duration}
+        {entry.duration || "-"}
       </TableCell>
 
       <TableCell className="text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors">
-        {entry.year}
+        {entry.year || "-"}
       </TableCell>
 
       <TableCell>
@@ -112,16 +125,18 @@ export const MediaTableRow = forwardRef<
             <Edit className="w-4 h-4 group-hover/btn:rotate-12 transition-transform duration-300" />
           </Button>
 
-          <DeleteConfirmDialog
-            title={entry.title}
-            onConfirm={() => onDelete(entry.id)}
-          >
+          <DeleteConfirmDialog title={entry.title} onConfirm={handleDelete}>
             <Button
               size="sm"
               variant="outline"
+              disabled={isDeleting}
               className="border-red-300 dark:border-red-500/30 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/20 hover:border-red-400 dark:hover:border-red-500/50 hover:text-red-700 dark:hover:text-red-300 transition-all duration-300 group/btn bg-transparent"
             >
-              <Trash2 className="w-4 h-4 group-hover/btn:scale-110 transition-transform duration-300" />
+              {isDeleting ? (
+                <div className="w-4 h-4 border-2 border-red-300 border-t-red-600 rounded-full animate-spin" />
+              ) : (
+                <Trash2 className="w-4 h-4 group-hover/btn:scale-110 transition-transform duration-300" />
+              )}
             </Button>
           </DeleteConfirmDialog>
         </div>
