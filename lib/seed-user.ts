@@ -1,26 +1,33 @@
 import { prisma } from "@/lib/prisma";
 
-export async function seedUserCollection(userId: string) {
+export async function seedUserCollection(userId: string, force = false) {
   try {
-    // Check if user is already seeded
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { isSeeded: true },
-    });
+    // Check if user is already seeded (unless forcing)
+    if (!force) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { isSeeded: true },
+      });
 
-    if (user?.isSeeded) {
-      return; // User already has seeded data
+      if (user?.isSeeded) {
+        console.log(`User ${userId} already seeded`);
+        return; // User already has seeded data
+      }
     }
 
-    // Get all global entries (you can create these manually or have a system user)
+    // Get all global entries
     const globalEntries = await prisma.mediaEntry.findMany({
       where: { isGlobal: true },
       take: 20, // Limit to prevent too many entries
     });
 
+    console.log(`Found ${globalEntries.length} global entries`);
+
     if (globalEntries.length === 0) {
       // If no global entries exist, create some default ones
-      await createDefaultGlobalEntries();
+      console.log("No global entries found, creating defaults...");
+      await createDefaultGlobalEntries(userId);
+
       // Retry getting global entries
       const newGlobalEntries = await prisma.mediaEntry.findMany({
         where: { isGlobal: true },
@@ -45,38 +52,62 @@ export async function seedUserCollection(userId: string) {
     );
   } catch (error) {
     console.error("Error seeding user collection:", error);
-    // Don't throw error to prevent blocking user registration/login
+    throw error; // Re-throw for API endpoint to handle
   }
 }
 
 async function copyGlobalEntriesToUser(userId: string, globalEntries: any[]) {
-  const userEntries = globalEntries.map((entry) => ({
-    userId,
-    title: entry.title,
-    type: entry.type,
-    director: entry.director,
-    budget: entry.budget,
-    location: entry.location,
-    duration: entry.duration,
-    year: entry.year,
-    genre: entry.genre,
-    description: entry.description,
-    rating: entry.rating,
-    posterUrl: entry.posterUrl,
-    isGlobal: false, // User's copy is not global
-    globalId: entry.id, // Reference to original global entry
-  }));
+  console.log(
+    `Copying ${globalEntries.length} global entries to user ${userId}`
+  );
 
-  await prisma.mediaEntry.createMany({
-    data: userEntries,
-    skipDuplicates: true,
+  // Check if user already has any of these entries to avoid duplicates
+  const existingTitles = await prisma.mediaEntry.findMany({
+    where: {
+      userId,
+      title: {
+        in: globalEntries.map((entry) => entry.title),
+      },
+    },
+    select: { title: true },
   });
+
+  const existingTitleSet = new Set(existingTitles.map((entry) => entry.title));
+
+  const userEntries = globalEntries
+    .filter((entry) => !existingTitleSet.has(entry.title)) // Avoid duplicates
+    .map((entry) => ({
+      userId,
+      title: entry.title,
+      type: entry.type,
+      director: entry.director,
+      budget: entry.budget,
+      location: entry.location,
+      duration: entry.duration,
+      year: entry.year,
+      genre: entry.genre,
+      description: entry.description,
+      rating: entry.rating,
+      posterUrl: entry.posterUrl,
+      isGlobal: false, // User's copy is not global
+      globalId: entry.id, // Reference to original global entry
+    }));
+
+  if (userEntries.length > 0) {
+    await prisma.mediaEntry.createMany({
+      data: userEntries,
+      skipDuplicates: true,
+    });
+    console.log(`Created ${userEntries.length} new entries for user`);
+  } else {
+    console.log("No new entries to create (all already exist)");
+  }
 }
 
-async function createDefaultGlobalEntries() {
+async function createDefaultGlobalEntries(userId: string) {
   const defaultEntries = [
     {
-      userId: "system", // You'll need to create a system user or use an existing user ID
+      userId: userId, // Use the current user as the system user
       title: "Blade Runner 2049",
       type: "Movie" as const,
       director: "Denis Villeneuve",
@@ -91,7 +122,7 @@ async function createDefaultGlobalEntries() {
       isGlobal: true,
     },
     {
-      userId: "system",
+      userId: userId,
       title: "The Matrix",
       type: "Movie" as const,
       director: "The Wachowskis",
@@ -106,7 +137,7 @@ async function createDefaultGlobalEntries() {
       isGlobal: true,
     },
     {
-      userId: "system",
+      userId: userId,
       title: "Cyberpunk: Edgerunners",
       type: "TV_Show" as const,
       director: "Hiroyuki Imaishi",
@@ -121,7 +152,7 @@ async function createDefaultGlobalEntries() {
       isGlobal: true,
     },
     {
-      userId: "system",
+      userId: userId,
       title: "Black Mirror",
       type: "TV_Show" as const,
       director: "Charlie Brooker",
@@ -136,7 +167,7 @@ async function createDefaultGlobalEntries() {
       isGlobal: true,
     },
     {
-      userId: "system",
+      userId: userId,
       title: "Ghost in the Shell",
       type: "Movie" as const,
       director: "Mamoru Oshii",
@@ -157,6 +188,7 @@ async function createDefaultGlobalEntries() {
       data: defaultEntries,
       skipDuplicates: true,
     });
+    console.log(`Created ${defaultEntries.length} default global entries`);
   } catch (error) {
     console.error("Error creating default global entries:", error);
   }

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { SeedButton } from "@/components/admin/seed-button";
 import { Search, Filter, Plus, Zap } from "lucide-react";
 
 interface SearchAndFiltersProps {
@@ -62,22 +63,22 @@ export function SearchAndFilters({
                   <SelectTrigger className="w-40 bg-white/60 dark:bg-black/60 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:border-purple-500 dark:focus:border-purple-500 focus:ring-purple-500/20 dark:focus:ring-purple-500/20 transition-all duration-300">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white/95 dark:bg-black/90 border-gray-300 dark:border-gray-700 backdrop-blur-sm cursor-pointer">
+                  <SelectContent className="bg-white/95 dark:bg-black/90 border-gray-300 dark:border-gray-700 backdrop-blur-sm">
                     <SelectItem
                       value="all"
-                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400 cursor-pointer"
+                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400"
                     >
                       All Types
                     </SelectItem>
                     <SelectItem
                       value="Movie"
-                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400 cursor-pointer"
+                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400"
                     >
                       Movies
                     </SelectItem>
                     <SelectItem
                       value="TV Show"
-                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400 cursor-pointer"
+                      className="text-gray-900 dark:text-gray-100 focus:bg-gray-100 dark:focus:bg-gray-800 focus:text-cyan-600 dark:focus:text-cyan-400"
                     >
                       TV Shows
                     </SelectItem>
@@ -86,16 +87,22 @@ export function SearchAndFilters({
               </div>
             </div>
 
-            {/* Add Button */}
-            <Button
-              onClick={onAddClick}
-              className="bg-gradient-to-r from-cyan-600 to-purple-600 dark:from-cyan-600 dark:to-purple-600 hover:from-cyan-500 hover:to-purple-500 dark:hover:from-cyan-500 dark:hover:to-purple-500 text-white border-0 shadow-lg hover:shadow-cyan-500/25 dark:hover:shadow-cyan-500/25 transition-all duration-300 group relative overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-              <Plus className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform duration-300" />
-              Add New Entry
-              <Zap className="w-3 h-3 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </Button>
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              {/* Seed Buttons (for testing/admin) */}
+              <SeedButton />
+
+              {/* Add Button */}
+              <Button
+                onClick={onAddClick}
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 dark:from-cyan-600 dark:to-purple-600 hover:from-cyan-500 hover:to-purple-500 dark:hover:from-cyan-500 dark:hover:to-purple-500 text-white border-0 shadow-lg hover:shadow-cyan-500/25 dark:hover:shadow-cyan-500/25 transition-all duration-300 group relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                <Plus className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform duration-300" />
+                Add New Entry
+                <Zap className="w-3 h-3 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
