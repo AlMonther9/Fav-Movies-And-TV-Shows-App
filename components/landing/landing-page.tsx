@@ -106,36 +106,51 @@ export function LandingPage() {
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1">
-                  <Film className="w-6 h-6 text-cyan-500 dark:text-cyan-400" />
-                  <span className="text-xl font-bold bg-gradient-to-r from-cyan-600 to-purple-600 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent">
-                    CyberLib
-                  </span>
-                </div>
+            <div className="flex items-center gap-1">
+              <Film className="w-6 h-6 text-cyan-500 dark:text-cyan-400" />
+              <span className="text-xl font-bold bg-gradient-to-r from-cyan-600 to-purple-600 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent">
+                CyberLib
+              </span>
+            </div>
               </div>
 
               <div className="flex items-center gap-4">
-                <ThemeToggle />
-                <div className="flex gap-2">
-                  <Button
-                    asChild
-                    variant="outline"
-                    size="sm"
-                    className="border-cyan-500/30 dark:border-cyan-500/30 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-500/10 transition-all duration-300 bg-transparent"
-                  >
-                    <Link href="/auth/signin">Sign In</Link>
-                  </Button>
-                  <Button
-                    asChild
-                    size="sm"
-                    className="bg-gradient-to-r from-cyan-600 to-purple-600 dark:from-cyan-600 dark:to-purple-600 hover:from-cyan-500 hover:to-purple-500 dark:hover:from-cyan-500 dark:hover:to-purple-500 text-white border-0 group"
-                  >
-                    <Link href="/auth/signup">
-                      Get Started
-                      <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-300" />
-                    </Link>
-                  </Button>
-                </div>
+            <ThemeToggle />
+            <div className="hidden sm:flex gap-2">
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="border-cyan-500/30 dark:border-cyan-500/30 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-500/10 transition-all duration-300 bg-transparent"
+              >
+                <Link href="/auth/signin">Sign In</Link>
+              </Button>
+              <Button
+                asChild
+                size="sm"
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 dark:from-cyan-600 dark:to-purple-600 hover:from-cyan-500 hover:to-purple-500 dark:hover:from-cyan-500 dark:hover:to-purple-500 text-white border-0 group"
+              >
+                <Link href="/auth/signup">
+                  Get Started
+                  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-300" />
+                </Link>
+              </Button>
+            </div>
+
+            {/* Mobile Menu */}
+            <div className="sm:hidden">
+              <Button
+                asChild
+                variant="outline"
+                size="icon"
+                className="border-cyan-500/30 dark:border-cyan-500/30 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-500/10 transition-all duration-300 bg-transparent"
+              >
+                <Link href="/auth/signin">
+                  <span className="sr-only">Sign In</span>
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </Button>
+            </div>
               </div>
             </div>
           </div>
