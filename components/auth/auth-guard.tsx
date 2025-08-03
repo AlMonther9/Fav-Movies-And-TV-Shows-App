@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -10,9 +9,14 @@ import { LoadingSpinner } from "@/components/loading-spinner";
 interface AuthGuardProps {
   children: React.ReactNode;
   requireAuth?: boolean;
+  redirectTo?: string;
 }
 
-export function AuthGuard({ children, requireAuth = true }: AuthGuardProps) {
+export function AuthGuard({
+  children,
+  requireAuth = true,
+  redirectTo,
+}: AuthGuardProps) {
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -20,15 +24,15 @@ export function AuthGuard({ children, requireAuth = true }: AuthGuardProps) {
     if (status === "loading") return; // Still loading
 
     if (requireAuth && !session) {
-      router.push("/auth/signin");
+      router.push(redirectTo || "/auth/signin");
       return;
     }
 
-    if (!requireAuth && session) {
-      router.push("/");
+    if (!requireAuth && session && redirectTo) {
+      router.push(redirectTo);
       return;
     }
-  }, [session, status, router, requireAuth]);
+  }, [session, status, router, requireAuth, redirectTo]);
 
   if (status === "loading") {
     return (
@@ -45,7 +49,7 @@ export function AuthGuard({ children, requireAuth = true }: AuthGuardProps) {
     return null; // Will redirect
   }
 
-  if (!requireAuth && session) {
+  if (!requireAuth && session && redirectTo) {
     return null; // Will redirect
   }
 
