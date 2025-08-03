@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { seedUserCollection } from "@/lib/seed-user";
 import { z } from "zod";
 
 const registerSchema = z.object({
@@ -36,6 +37,11 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
       },
+    });
+
+    // Seed user's collection with global entries (async, don't wait)
+    seedUserCollection(user.id).catch((error) => {
+      console.error("Failed to seed user collection:", error);
     });
 
     // Remove password from response

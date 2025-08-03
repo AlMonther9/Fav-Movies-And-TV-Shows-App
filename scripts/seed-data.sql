@@ -2,7 +2,7 @@
 -- This will only work after you have users in your database
 
 -- First, you need to get a user ID from your users table
--- Replace 'your-user-id-here' with an actual user ID from your database
+-- Replace 'cmdvrvw5q0000qfxck1l0fkpv' with an actual user ID from your database
 
 INSERT INTO "MediaEntry" (
   "userId", 
@@ -18,7 +18,7 @@ INSERT INTO "MediaEntry" (
   rating
 ) VALUES 
 (
-  'your-user-id-here',
+  'cmdvrvw5q0000qfxck1l0fkpv',
   'Blade Runner 2049',
   'Movie',
   'Denis Villeneuve',
@@ -31,7 +31,7 @@ INSERT INTO "MediaEntry" (
   5
 ),
 (
-  'your-user-id-here',
+  'cmdvrvw5q0000qfxck1l0fkpv',
   'Cyberpunk: Edgerunners',
   'TV_Show',
   'Hiroyuki Imaishi',
@@ -44,7 +44,7 @@ INSERT INTO "MediaEntry" (
   5
 ),
 (
-  'your-user-id-here',
+  'cmdvrvw5q0000qfxck1l0fkpv',
   'The Matrix',
   'Movie',
   'The Wachowskis',

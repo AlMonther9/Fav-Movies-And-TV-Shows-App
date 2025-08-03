@@ -4,6 +4,7 @@ import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
+import { seedUserCollection } from "@/lib/seed-user";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
@@ -75,6 +76,24 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
       }
       return session;
+    },
+    async signIn({ user, account }) {
+      // For OAuth providers, seed the user collection if they're new
+      if (account?.provider !== "credentials" && user.id) {
+        // Check if user needs seeding (for OAuth users)
+        const existingUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { isSeeded: true },
+        });
+
+        if (existingUser && !existingUser.isSeeded) {
+          // Seed user's collection with global entries (async, don't wait)
+          seedUserCollection(user.id).catch((error) => {
+            console.error("Failed to seed OAuth user collection:", error);
+          });
+        }
+      }
+      return true;
     },
   },
 };

@@ -13,18 +13,20 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Skull, AlertTriangle } from "lucide-react";
+import { Skull, AlertTriangle, Globe } from "lucide-react";
 
 interface DeleteConfirmDialogProps {
   children: React.ReactNode;
   title: string;
   onConfirm: () => void;
+  isGlobalEntry?: boolean;
 }
 
 export function DeleteConfirmDialog({
   children,
   title,
   onConfirm,
+  isGlobalEntry = false,
 }: DeleteConfirmDialogProps) {
   return (
     <AlertDialog>
@@ -45,7 +47,7 @@ export function DeleteConfirmDialog({
               </div>
               <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-red-500 dark:via-red-400 to-transparent mx-auto animate-pulse" />
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-center text-gray-700 dark:text-gray-300 space-y-2 transition-colors duration-300">
+            <AlertDialogDescription className="text-center text-gray-700 dark:text-gray-300 space-y-3 transition-colors duration-300">
               <p className="text-lg">
                 Are you sure you want to delete{" "}
                 <span className="text-cyan-600 dark:text-cyan-400 font-semibold">
@@ -53,6 +55,22 @@ export function DeleteConfirmDialog({
                 </span>
                 ?
               </p>
+
+              {isGlobalEntry && (
+                <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Globe className="w-4 h-4 text-green-600 dark:text-green-400" />
+                    <span className="text-sm font-semibold text-green-700 dark:text-green-300">
+                      Starter Collection Item
+                    </span>
+                  </div>
+                  <p className="text-sm text-green-600 dark:text-green-300">
+                    This was part of your starter collection. You can delete it,
+                    but it won't be restored automatically.
+                  </p>
+                </div>
+              )}
+
               <p className="text-sm text-red-600 dark:text-red-300">
                 ⚠️ This action cannot be undone and will permanently remove the
                 entry from your collection.

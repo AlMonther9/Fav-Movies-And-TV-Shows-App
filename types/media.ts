@@ -12,4 +12,6 @@ export interface MediaEntry {
   rating: number;
   createdAt: string;
   updatedAt?: string;
+  isGlobal?: boolean;
+  globalId?: number;
 }

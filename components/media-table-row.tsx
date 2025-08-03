@@ -5,11 +5,11 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
-import { Film, Tv, Edit, Trash2, Star } from "lucide-react";
+import { Film, Tv, Edit, Trash2, Star, Globe } from "lucide-react";
 import type { MediaEntry } from "@/types/media";
 
 interface MediaTableRowProps {
-  entry: MediaEntry;
+  entry: MediaEntry & { isGlobal?: boolean; globalId?: number };
   onEdit: (entry: MediaEntry) => void;
   onDelete: (id: number) => Promise<void>;
 }
@@ -46,26 +46,46 @@ export const MediaTableRow = forwardRef<
             )}
             <div className="absolute inset-0 bg-current opacity-20 rounded-full blur-sm group-hover:opacity-40 transition-opacity" />
           </div>
-          <span
-            className="text-gray-900 dark:text-gray-100 group-hover:text-gray-700 dark:group-hover:text-white transition-colors max-w-[200px] truncate"
-            title={entry.title}
-          >
-            {entry.title}
-          </span>
+          <div className="flex flex-col">
+            <span
+              className="text-gray-900 dark:text-gray-100 group-hover:text-gray-700 dark:group-hover:text-white transition-colors max-w-[200px] truncate"
+              title={entry.title}
+            >
+              {entry.title}
+            </span>
+            {entry.globalId && (
+              <div className="flex items-center gap-1 mt-1">
+                <Globe className="w-3 h-3 text-green-500 dark:text-green-400" />
+                <span className="text-xs text-green-600 dark:text-green-400">
+                  From Global Collection
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </TableCell>
 
       <TableCell>
-        <Badge
-          variant={entry.type === "Movie" ? "default" : "secondary"}
-          className={
-            entry.type === "Movie"
-              ? "bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-500/30 hover:bg-cyan-200 dark:hover:bg-cyan-500/30 transition-colors"
-              : "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-500/30 hover:bg-purple-200 dark:hover:bg-purple-500/30 transition-colors"
-          }
-        >
-          {entry.type}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge
+            variant={entry.type === "Movie" ? "default" : "secondary"}
+            className={
+              entry.type === "Movie"
+                ? "bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-500/30 hover:bg-cyan-200 dark:hover:bg-cyan-500/30 transition-colors"
+                : "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-500/30 hover:bg-purple-200 dark:hover:bg-purple-500/30 transition-colors"
+            }
+          >
+            {entry.type}
+          </Badge>
+          {entry.globalId && (
+            <Badge
+              variant="outline"
+              className="border-green-300 dark:border-green-500/30 text-green-700 dark:text-green-300 hover:bg-green-50 dark:hover:bg-green-500/20 transition-colors text-xs"
+            >
+              Starter
+            </Badge>
+          )}
+        </div>
       </TableCell>
 
       <TableCell className="text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors">
@@ -125,7 +145,11 @@ export const MediaTableRow = forwardRef<
             <Edit className="w-4 h-4 group-hover/btn:rotate-12 transition-transform duration-300" />
           </Button>
 
-          <DeleteConfirmDialog title={entry.title} onConfirm={handleDelete}>
+          <DeleteConfirmDialog
+            title={entry.title}
+            onConfirm={handleDelete}
+            isGlobalEntry={!!entry.globalId}
+          >
             <Button
               size="sm"
               variant="outline"
