@@ -2,8 +2,14 @@
 
 import { Film, Tv, Zap } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { UserMenu } from "@/components/auth/user-menu";
+import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function AppHeader() {
+  const { data: session } = useSession();
+
   return (
     <div className="relative overflow-hidden border-b border-cyan-500/20 dark:border-cyan-500/20 bg-white/80 dark:bg-black/50 backdrop-blur-sm transition-colors duration-500">
       {/* Animated glow effect */}
@@ -11,9 +17,30 @@ export function AppHeader() {
 
       <div className="relative z-10 container mx-auto px-4 py-12">
         <div className="text-center space-y-4">
-          {/* Theme Toggle - positioned absolutely */}
-          <div className="absolute top-4 right-4">
+          {/* Controls - positioned absolutely */}
+          <div className="absolute top-4 right-4 flex items-center gap-3">
             <ThemeToggle />
+            {session ? (
+              <UserMenu />
+            ) : (
+              <div className="flex gap-2">
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="border-cyan-500/30 dark:border-cyan-500/30 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-500/10 transition-all duration-300 bg-transparent"
+                >
+                  <Link href="/auth/signin">Sign In</Link>
+                </Button>
+                <Button
+                  asChild
+                  size="sm"
+                  className="bg-gradient-to-r from-cyan-600 to-purple-600 dark:from-cyan-600 dark:to-purple-600 hover:from-cyan-500 hover:to-purple-500 dark:hover:from-cyan-500 dark:hover:to-purple-500 text-white border-0"
+                >
+                  <Link href="/auth/signup">Sign Up</Link>
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Logo/Icon with animation */}
@@ -46,6 +73,17 @@ export function AppHeader() {
               neon-lit future
             </span>
           </p>
+
+          {/* User greeting */}
+          {session && (
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Welcome back,{" "}
+              <span className="text-cyan-600 dark:text-cyan-400 font-semibold">
+                {session.user.name}
+              </span>
+              !
+            </p>
+          )}
 
           {/* Animated underline */}
           <div className="flex justify-center mt-6">

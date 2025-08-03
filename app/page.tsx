@@ -5,6 +5,7 @@ import { AppHeader } from "@/components/app-header";
 import { SearchAndFilters } from "@/components/search-and-filters";
 import { MediaTable } from "@/components/media-table";
 import { AddEntryModal } from "@/components/add-entry-modal";
+import { AuthGuard } from "@/components/auth/auth-guard";
 import { useToast } from "@/hooks/use-toast";
 import type { MediaEntry } from "@/types/media";
 
@@ -177,58 +178,58 @@ export default function FavoriteMediaApp() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-black dark:via-gray-900 dark:to-black transition-colors duration-500">
-      {/* Animated background grid */}
-      <div className="fixed inset-0 opacity-10 dark:opacity-20">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.1)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(0,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.1)_1px,transparent_1px)] bg-[size:50px_50px] animate-pulse" />
-      </div>
+    <AuthGuard>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-black dark:via-gray-900 dark:to-black transition-colors duration-500">
+        {/* Animated background grid */}
+        <div className="fixed inset-0 opacity-10 dark:opacity-20">
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.1)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(0,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.1)_1px,transparent_1px)] bg-[size:50px_50px] animate-pulse" />
+        </div>
 
-      <div className="relative z-10">
-        <AppHeader />
+        <div className="relative z-10">
+          <AppHeader />
 
-        <div className="container mx-auto px-4 py-8 space-y-8">
-          <SearchAndFilters
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            filterType={filterType}
-            onFilterChange={setFilterType}
-            onAddClick={() => {
-              setEditingEntry(null);
-              setIsAddDialogOpen(true);
-            }}
-            resultsCount={filteredEntries.length}
-            totalCount={entries.length}
-          />
+          <div className="container mx-auto px-4 py-8 space-y-8">
+            <SearchAndFilters
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              filterType={filterType}
+              onFilterChange={setFilterType}
+              onAddClick={() => {
+                setEditingEntry(null);
+                setIsAddDialogOpen(true);
+              }}
+              resultsCount={filteredEntries.length}
+              totalCount={entries.length}
+            />
 
-          <MediaTable
-            entries={filteredEntries}
-            loading={loading}
-            hasMore={hasMore}
-            onLoadMore={handleLoadMore}
-            onEdit={(entry) => {
-              setEditingEntry(entry);
-              setIsAddDialogOpen(true);
-            }}
-            onDelete={handleDeleteEntry}
-          />
+            <MediaTable
+              entries={filteredEntries}
+              loading={loading}
+              hasMore={hasMore}
+              onLoadMore={handleLoadMore}
+              onEdit={(entry) => {
+                setEditingEntry(entry);
+                setIsAddDialogOpen(true);
+              }}
+              onDelete={handleDeleteEntry}
+            />
 
-          <AddEntryModal
-            isOpen={isAddDialogOpen}
-            onClose={() => {
-              setIsAddDialogOpen(false);
-              setEditingEntry(null);
-            }}
-            onSubmit={(entry) => {
-              if (editingEntry) {
-                handleEditEntry(entry as MediaEntry);
-              } else {
-                handleAddEntry(entry as Omit<MediaEntry, "id" | "createdAt">);
+            <AddEntryModal
+              isOpen={isAddDialogOpen}
+              onClose={() => {
+                setIsAddDialogOpen(false);
+                setEditingEntry(null);
+              }}
+              onSubmit={(entry) =>
+                editingEntry
+                  ? handleEditEntry(entry as MediaEntry)
+                  : handleAddEntry(entry as Omit<MediaEntry, "id" | "createdAt">)
               }
-            }}
-            editingEntry={editingEntry}
-          />
+              editingEntry={editingEntry}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </AuthGuard>
   );
 }
